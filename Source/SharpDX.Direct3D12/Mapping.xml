@@ -48,18 +48,18 @@
   </context-set>
 
   <!-- D3D12 extensions -->
-  <extension>
+  <extension>     
     <context id="d3d12-all"/>
 
     <const from-macro="D3D12_SDK_VERSION" class="SharpDX.Direct3D12.D3D12" type="int" name="SdkVersion" />
     <create class="D3D12" />
-    
+
     <context-clear />
   </extension>
 
   <!-- D3D12 bindings -->
-  <bindings> 
-    
+  <bindings>
+  
   </bindings>
 
   <!-- D3D12 mapping -->
@@ -109,7 +109,12 @@
     
     <map enum="D3D12_FORMAT_SUPPORT1" flags="true"/>
     <map enum="D3D12_FORMAT_SUPPORT2" flags="true"/>
+    <map enum="D3D12_RESOURCE_STATES" flags="true"/>
 
+    <map enum="D3D_SHADER_MODEL" name="ShaderModel"/>
+    <map enum-item="D3D_SHADER_MODEL_5_1" name="Model51"/>
+    <map enum-item="D3D_SHADER_MODEL_6_0" name="Model60"/>
+    
     <!--
     // *****************************************************************
     // D3D12 Struct
@@ -145,9 +150,15 @@
 
     <map field="D3D12_ROOT_SIGNATURE::pParameters" name="ParametersPointer"/>
 
-    <map struct="D3D12_ROOT_SIGNATURE_DESC" struct-to-class="true"/>
+    <map struct="D3D12_ROOT_SIGNATURE_DESC" struct-to-class="true" marshal="true"/>
     <remove field="D3D12_ROOT_SIGNATURE_DESC::.*"/>
-    
+
+    <map struct="D3D12_ROOT_SIGNATURE_DESC1" struct-to-class="true" marshal="true"/>
+    <remove field="D3D12_ROOT_SIGNATURE_DESC1::.*"/>
+
+    <map struct="D3D12_VERSIONED_ROOT_SIGNATURE_DESC" struct-to-class="true" marshal="true"/>
+    <remove field="D3D12_VERSIONED_ROOT_SIGNATURE_DESC::.*"/>
+      
     <map struct="D3D12_INPUT_LAYOUT_DESC" struct-to-class="true" marshalto="true"/>
     <map field="D3D12_INPUT_LAYOUT_DESC::pInputElementDescs" name="InputElementsPointer" visibility="private"/>
     <map field="D3D12_INPUT_LAYOUT_DESC::NumElements" visibility="private"/>
@@ -181,6 +192,9 @@
     <remove field="D3D12_RESOURCE_BARRIER::.*"/>
     <remove field="D3D12_ROOT_PARAMETER::.*"/>
     <remove field="D3D12_TEXTURE_COPY_LOCATION::.*" />
+
+    <!--Remove all fields for D3D12_ROOT_PARAMETER1 as the union with pointers cannot be mapped safely in x86/x64 with C# explicit layout-->
+    <remove field="D3D12_ROOT_PARAMETER1::.*" />
     
     <map struct="D3D12_CACHED_PIPELINE_STATE::pCachedBlob" name="CachedBlobPointer"/>
 
@@ -296,10 +310,10 @@
     <map param="ID3D12Device::CreateComputePipelineState::pDesc" attribute="in" type="void"/>
 
     <map method="ID3D12RootSignatureDeserializer::GetRootSignature" type="void" property="false" visibility="private"/>
-
     <map param="ID3D12Resource::Map::pReadRange" default="null"/>
     <map param="ID3D12Resource::Unmap::pWrittenRange" default="null"/>
     <map param="ID3D12Resource::Map::ppData" attribute="out" return="true"/>
+    <map param="ID3D12Resource::ReadFromSubresource::pDstData" attribute="in value"/>
 
     <map method="ID3D12GraphicsCommandList::OMSetRenderTargets" visibility="private"/>
     <map param="ID3D12GraphicsCommandList::OMSetRenderTargets::pRenderTargetDescriptors" type="void"/>
@@ -314,9 +328,13 @@
    
     <remove function=".*_Stub"/>
     <remove function=".*_Proxy"/>
+    <remove function="D3D12SerializeVersionedRootSignature"/>
+    <remove method="ID3D12Device1::CreatePipelineLibrary"/>
+    <remove interface="ID3D12VersionedRootSignatureDeserializer"/>
+    
+    <map method="ID3D12RootSignatureDeserializer::GetRootSignatureDesc" type="void" property="false" visibility="private"/>
     <map function="D3D12(.+)" name-tmp="$1" />
     <map function="D3D12.*" dll='"d3d12.dll"' group="SharpDX.Direct3D12.D3D12" />
-    <map function="D3D11CreateDeviceForD3D12" dll='"d3d12.dll"' group="SharpDX.Direct3D12.D3D12" />
     <map param="D3D12CreateDevice::ppDevice" type="ID3D12Device" attribute="out fast" />
     <map function="D3D12CreateDevice" check="false"/>
     <map param="D3D12CreateDevice.*?::Flags" type="D3D12_CREATE_DEVICE_FLAG" />
@@ -327,9 +345,6 @@
     <map param="D3D12CreateDeviceAndSwapChain::ppSwapChain" type="IDXGISwapChain"/>
     <map param="D3D12CreateDeviceAndSwapChain::ppDevice" type="ID3D12Device"/>
 
-
-    <!-- Temporary remove d3d11 types -->
-    <remove function="D3D11CreateDeviceForD3D12"/>
 
     <!--
     // *****************************************************************

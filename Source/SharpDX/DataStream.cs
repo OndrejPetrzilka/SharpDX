@@ -106,16 +106,17 @@ namespace SharpDX
                 DataStream stream;
 
                 var sizeOfBuffer = Utilities.SizeOf(userBuffer);
+                var indexOffset = index * Utilities.SizeOf<T>();
 
                 if (pinBuffer)
                 {
                     var handle = GCHandle.Alloc(userBuffer, GCHandleType.Pinned);
-                    var indexOffset = index * Utilities.SizeOf<T>();
                     stream = new DataStream(indexOffset + (byte*)handle.AddrOfPinnedObject(), sizeOfBuffer - indexOffset, canRead, canWrite, handle);
                 }
                 else
                 {
-                    stream = new DataStream(Interop.Fixed(userBuffer), sizeOfBuffer, canRead, canWrite, true);
+                    // The .NET Native compiler crashes if '(IntPtr)' is removed.
+                    stream = new DataStream(indexOffset + (byte*)(IntPtr)Interop.Fixed(userBuffer), sizeOfBuffer - indexOffset, canRead, canWrite, true);
                 }
 
                 return stream;

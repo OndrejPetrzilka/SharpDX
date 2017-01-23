@@ -32,6 +32,8 @@
   <include file="d3d11.h" />
   <include file="d3d11_1.h" />
   <include file="d3d11_2.h" />
+  <include file="d3d11_3.h" />
+  <include file="d3d11_4.h" />
   <include file="d3d12.h" />
 
   <include file="d3d12sdklayers.h" />
@@ -49,11 +51,20 @@
     <context>d3d10misc</context>
     <context>d3d10sdklayers</context>
     <context>d3d10shader</context>
+    <context>d3d10effect</context>
+
+    <context>d3dx10</context>
+    <context>d3dx10core</context>
+    <context>d3dx10tex</context>
+    <context>d3dx10mesh</context>
+    <context>d3dx10async</context>
+      
     
     <context>d3d11</context>
     <context>d3d11_1</context>
     <context>d3d11_2</context>
     <context>d3d11_3</context>
+    <context>d3d11_4</context>
     <context>d3d12</context>
     <context>d3d12sdklayers</context>
     <context>d3d11sdklayers</context>
@@ -284,8 +295,7 @@
     // *****************************************************************
     -->
     <map interface="ID3D1[0-3](.+)" name-tmp="$1" />
-    <map interface="ID3DX10(.+)" name-tmp="$1" />
-    <map interface="ID3DX11(.+)" name-tmp="$1" />
+    <map interface="ID3DX1[0-3](.+)" name-tmp="$1" />
 
     <map method=".*::GetPrivateData" check="false"/>
 
@@ -329,6 +339,7 @@
     <map method="ID3D(\d+)DeviceContext::SetTargets" visibility="internal" />
     <map method="ID3D(\d+)DeviceContext::SetRenderTargetsAndUnorderedAccessViews" visibility="internal" />
     <map param="ID3D(\d+)DeviceContext::ClearRenderTargetView::ColorRGBA" type="SHARPDX_COLOR4" pointer="*" array="0" />
+    <map param="ID3D(\d+)DeviceContext1::ClearView::Color" type="SHARPDX_COLOR4" pointer="*" array="0"/>
     <map method="ID3D\d+DeviceContext::IA(.*)" name="$1" />
     <map method="ID3D\d+DeviceContext::VS(.*)" name="$1" />
     <map method="ID3D\d+DeviceContext::PS(.*)" name="$1" />
